@@ -2,6 +2,7 @@ export class Product {
 
     // below properties should match with
     // JSON data returned from REST API
+    id: string;
     sku: string;
     name: string;
     description: string;

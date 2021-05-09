@@ -9,6 +9,7 @@ import { ProductCategory } from '../common/product-category';
   providedIn: 'root'
 })
 export class ProductService {
+  
   // Note: initially this whole class is empty.
   // Below code is written by hand.
 
@@ -20,6 +21,19 @@ export class ProductService {
 
 
   constructor(private httpClient : HttpClient) { }
+
+  getProductsListPaginate(thePage: number, 
+                          thePageSize: number,
+                          theCategoryId : number) : Observable<GetResponseProducts>
+  {
+    //need to build url based on category id
+    const searchUrl =`${this.baseUrl}/search/findByCategoryId?id=${theCategoryId}`
+                      + `&page=${thePage}&size=${thePageSize}`;
+
+    return this.httpClient.get<GetResponseProducts>(searchUrl);
+  }
+
+  
 
   getProductsList(theCategoryId : number) : Observable<Product[]>
   {
@@ -47,11 +61,31 @@ export class ProductService {
     
   }
 
+  searchProductsPaginate(thePage: number, 
+                          thePageSize: number,
+                          theKeyword : string) : Observable<GetResponseProducts>
+                      {
+                      //need to build url based on category id
+                      const searchUrl =`${this.baseUrl}/search/findByNameContaining?name=${theKeyword}`;
+                      + `&page=${thePage}&size=${thePageSize}`;
+
+                      return this.httpClient.get<GetResponseProducts>(searchUrl);
+                      }
+
+
 //select the repetitive code -> refactor -> to a method
   private getProducts(searchUrl: string): Observable<Product[]> {
     return this.httpClient.get<GetResponseProducts>(searchUrl).pipe(
       map(response => response._embedded.products)
     );
+  }
+
+
+  getProduct(theProductId: number): Observable<Product> {
+      // need to build url based on product id
+      const productUrl = `${this.baseUrl}/${theProductId}`;
+
+      return this.httpClient.get<Product>(productUrl);
   }
 
 }
@@ -62,6 +96,12 @@ export class ProductService {
 interface GetResponseProducts{
   _embedded:{
     products: Product[]
+  },
+  page:{
+    size: number,
+    totalElements: number,
+    totalPages: number,
+    number: number
   }
 }
 
